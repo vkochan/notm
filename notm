@@ -246,7 +246,7 @@ _sf_c_p() {
   fi
 }
 
-_sf_c_n() {
+_sf_c_t() {
   if [[ "$PWD" =~ "TASKS" ]]; then
     if (( ${#_tm_selected[@]} > 0 )); then
       _tm_change_state "TODO" ${_tm_selected[@]}
