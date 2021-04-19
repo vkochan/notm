@@ -122,6 +122,9 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
       "DONE")
              color=$TM_BLUE
              ;;
+      "TODO")
+             color=$TM_GREEN
+             ;;
       "IN-PROGRESS")
              color=$TM_YELLOW
              ;;
