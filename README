@@ -1,5 +1,10 @@
 This is a None task manager
 ===========================
+notm is based on 'sentaku' (https://github.com/rcmdnk/sentaku)
+tool which provides the menu-like navigation engine. The 'sentaku'
+script is added as part of this repository and is installed
+into ${PREFIX}/lib/notm, such approach does not require additional
+installation of sentaku.
 
 Navigation
 ==========
