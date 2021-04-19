@@ -1,0 +1,24 @@
+This is a None task manager
+===========================
+
+Navigation
+==========
+Use VIM style (h,j,k,l) navigation to browse
+over tasks and states.
+
+Create task
+===========
+1) Go to 'TASKS/'
+2) Press 't' and, enter task name and press 'Enter'
+3) Press 'l' to open created task and edit it.
+
+Created task will be moved to TODO state.
+
+Change task's state
+===================
+1) Select task from TASKS/ folder.
+2) Change task state by:
+
+    Ctr-P - move to IN-PROGRESS state
+    Ctr-D - move to DONE state
+    Ctr-T - move to TODO state
