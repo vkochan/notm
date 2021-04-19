@@ -26,10 +26,6 @@ relpath() {
   realpath --relative-to=$1 $2
 }
 
-_tm_init() {
-    mkdir $PWD/TASKS
-}
-
 _tm_change_state() {
   local new_state="$1"
   local rel_dir=""
@@ -61,6 +57,12 @@ _tm_change_state() {
 
   _s_v_selected=()
   _tm_selected=()
+}
+
+_tm_init() {
+    mkdir $PWD/TASKS
+
+    _tm_change_state "TODO" $(find ${TM_ROOT}/TASKS -type f)
 }
 
 _tm_refresh() {
