@@ -185,7 +185,7 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
           if [ -z "${state}" ]; then
             continue
           fi
-          find ${TM_ROOT}/${state} -type l -exec readlink -f {} \; > /tmp/dbg
+
           if find ${TM_ROOT}/${state} -type l -exec readlink -f {} \; | grep -q -F "${path}"; then
             show=$(printf "%-11s| %s" ${state} ${show})
           fi
