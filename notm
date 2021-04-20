@@ -186,7 +186,7 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
             continue
           fi
 
-          if find ${TM_ROOT}/${state} -type l -exec readlink -f {} \; | grep -q -F "${path}"; then
+          if find "${TM_ROOT}/${state}" -type l | xargs readlink -f | grep -n -q -F "${path}"; then
             show=$(printf "%-11s| %s" ${state} ${show})
           fi
       done
