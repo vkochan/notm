@@ -138,7 +138,6 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local path=$(readlink -f ${entry})
   local show=${entry}
   local state
-  local rel
 
   tput cup $2 0 >/dev/tty
   if [ $1 -eq 1 ];then
@@ -176,8 +175,6 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
 
   if [[ "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
     if [ -f "${entry}" ]; then
-      rel=$(relpath "$TM_ROOT/TASKS" "$(dirname ${PWD}/${entry})")
-
       for state in $(find $TM_ROOT -maxdepth 1 -type d -printf '%P\n'); do
           if [ "${state}" == "TASKS" ]; then
             continue
