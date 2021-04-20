@@ -42,7 +42,7 @@ _tm_unlink_state() {
 
   while [[ $# -gt 0 ]] 
   do
-    find ${TM_ROOT}/${1}/${rel_path} -type l -delete 2> /dev/null
+    unlink ${TM_ROOT}/${1}/${rel_path} 2> /dev/null
     shift 1
   done
 }
