@@ -137,6 +137,7 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local entry=${_s_inputs[$3]}
   local path=$(readlink -f ${entry})
   local show=${entry}
+  local prefix=""
   local state
 
   tput cup $2 0 >/dev/tty
@@ -166,10 +167,10 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
       if ! array_contains "${path}" "${_tm_selected[@]}"; then
         _tm_selected+=($(readlink -f $entry))
       fi 
-      show=" +${show}" > /dev/tty
+      prefix=" +"
     fi
   else
-    show="  ${show}" > /dev/tty
+    prefix="  "
   fi
 
 
@@ -184,13 +185,13 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
           fi
 
           if find "${TM_ROOT}/${state}" -type l | xargs readlink -f | grep -n -q -F "${path}"; then
-            show=$(printf "%-11s| %s" ${state} ${show})
+            show="$(printf "%-11s| %s" ${state} ${show})"
           fi
       done
     fi
   fi
 
-  printf "$show" > /dev/tty
+  printf "${prefix}${show}" > /dev/tty
 
   printf "\e[m" >/dev/tty
   tput cup $2 0 >/dev/tty
