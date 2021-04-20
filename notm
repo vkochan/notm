@@ -26,12 +26,32 @@ relpath() {
   realpath --relative-to=$1 $2
 }
 
+_tm_cleanup_links() {
+  find -L ${TM_ROOT} -type l -delete
+  find ${TM_ROOT}/TODO -empty -type d -delete 2> /dev/null
+  find ${TM_ROOT}/DONE -empty -type d -delete 2> /dev/null
+  find ${TM_ROOT}/IN-PROGRESS -empty -type d -delete 2> /dev/null
+}
+
+# $1 - task relative path
+# $N - states
+_tm_unlink_state() {
+  local rel_path=$1
+
+  shift 1
+
+  while [[ $# -gt 0 ]] 
+  do
+    find ${TM_ROOT}/${1}/${rel_path} -type l -delete 2> /dev/null
+    shift 1
+  done
+}
+
 _tm_change_state() {
   local new_state="$1"
   local rel_dir=""
   local new_dir=""
-  local cur_file=""
-  local fname=""
+  local task=""
 
   shift 1
 
@@ -39,17 +59,26 @@ _tm_change_state() {
   do
     if [ -f "$1" ]; then
       rel_dir=$(relpath "${TM_ROOT}/TASKS" $(dirname $1))
-      cur_file=$(readlink -f $1)
-      fname=$(basename $1)
       new_dir="${TM_ROOT}/${new_state}/${rel_dir}"
+      task=$(basename $1)
+
+      case $new_state in
+                "TODO")
+                     _tm_unlink_state "${rel_dir}/${task}" "IN-PROGRESS" "DONE"
+                     ;;
+        "IN-PROGRESS")
+                     _tm_unlink_state "${rel_dir}/${task}" "TODO" "DONE"
+                     ;;
+               "DONE")
+                     _tm_unlink_state "${rel_dir}/${task}" "TODO" "IN-PROGRESS"
+                     ;;
+      esac
 
       mkdir -p ${new_dir}
-      mv ${cur_file} ${new_dir}
-      ln -sf ${new_dir}/${fname} ${TM_ROOT}/TASKS/${rel_dir}/${fname}
 
-      find ${TM_ROOT}/TODO -empty -type d -delete 2> /dev/null
-      find ${TM_ROOT}/DONE -empty -type d -delete 2> /dev/null
-      find ${TM_ROOT}/IN-PROGRESS -empty -type d -delete 2> /dev/null
+      ln -sf ${TM_ROOT}/TASKS/${rel_dir}/${task} ${new_dir}/${task}
+
+      _tm_cleanup_links
     fi
 
     shift 1
@@ -62,7 +91,7 @@ _tm_change_state() {
 _tm_init() {
     mkdir $PWD/TASKS
 
-    _tm_change_state "TODO" $(find ${TM_ROOT}/TASKS -type f)
+    _tm_cleanup_links
 }
 
 _tm_refresh() {
@@ -106,9 +135,8 @@ array_contains() {
 
 _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local entry=${_s_inputs[$3]}
+  local path=$(readlink -f ${entry})
   local show=${entry}
-  local path
-  local link
   local state
   local rel
 
@@ -136,7 +164,6 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
 
   if ((_s_v_selected[$3] == 1)); then
     if [ "$entry" != ".." ]; then
-      path=$(readlink -f ${entry})
       if ! array_contains "${path}" "${_tm_selected[@]}"; then
         _tm_selected+=($(readlink -f $entry))
       fi 
@@ -148,13 +175,21 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
 
 
   if [[ "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
-    if [ -L "${entry}" ]; then
-      link="$(readlink ${entry})"
-      link="${link#${TM_ROOT}}"
+    if [ -f "${entry}" ]; then
       rel=$(relpath "$TM_ROOT/TASKS" "$(dirname ${PWD}/${entry})")
-      link="${link%${rel}/${entry}}"
-      state="$(basename ${link})"
-      show=$(printf "%-11s| %s" ${state} ${show})
+
+      for state in $(find $TM_ROOT -maxdepth 1 -type d -printf '%P\n'); do
+          if [ "${state}" == "TASKS" ]; then
+            continue
+          fi
+          if [ -z "${state}" ]; then
+            continue
+          fi
+          find ${TM_ROOT}/${state} -type l -exec readlink -f {} \; > /tmp/dbg
+          if find ${TM_ROOT}/${state} -type l -exec readlink -f {} \; | grep -q -F "${path}"; then
+            show=$(printf "%-11s| %s" ${state} ${show})
+          fi
+      done
     fi
   fi
 
@@ -230,6 +265,8 @@ _sf_x() {
       rm -rf ${_s_inputs[$_s_current_n]}
     fi
   fi
+
+  _tm_cleanup_links
   _tm_refresh
 }
 
@@ -271,8 +308,7 @@ _sf_t() {
    touch "$task"
 
    mkdir -p ${TM_ROOT}/TODO/${rel_dir}
-   mv ${PWD}/${task} ${TM_ROOT}/TODO/${rel_dir}
-   ln -sf ${TM_ROOT}/TODO/${rel_dir}/${task} ${task}
+   ln -sf $(readlink -f ${task}) ${TM_ROOT}/TODO/${rel_dir}/${task}
 
    _tm_echo_off
 }
