@@ -269,32 +269,26 @@ _sf_x() {
 }
 
 _sf_c_d() {
-  if [[ "$PWD" =~ "TASKS" ]]; then
-    if (( ${#_tm_selected[@]} > 0 )); then
-      _tm_change_state "DONE" ${_tm_selected[@]}
-    else
-      _tm_change_state "DONE" "${PWD}/${_s_inputs[$_s_current_n]}"
-    fi
+  if (( ${#_tm_selected[@]} > 0 )); then
+    _tm_change_state "DONE" ${_tm_selected[@]}
+  else
+    _tm_change_state "DONE" "$(readlink -f ${_s_inputs[$_s_current_n]})"
   fi
 }
 
 _sf_c_p() {
-  if [[ "$PWD" =~ "TASKS" ]]; then
-    if (( ${#_tm_selected[@]} > 0 )); then
-      _tm_change_state "IN-PROGRESS" ${_tm_selected[@]}
-    else
-      _tm_change_state "IN-PROGRESS" "$PWD/${_s_inputs[$_s_current_n]}"
-    fi
+  if (( ${#_tm_selected[@]} > 0 )); then
+    _tm_change_state "IN-PROGRESS" ${_tm_selected[@]}
+  else
+    _tm_change_state "IN-PROGRESS" "$(readlink -f ${_s_inputs[$_s_current_n]})"
   fi
 }
 
 _sf_c_t() {
-  if [[ "$PWD" =~ "TASKS" ]]; then
-    if (( ${#_tm_selected[@]} > 0 )); then
-      _tm_change_state "TODO" ${_tm_selected[@]}
-    else
-      _tm_change_state "TODO" "${PWD}/${_s_inputs[$_s_current_n]}"
-    fi
+  if (( ${#_tm_selected[@]} > 0 )); then
+    _tm_change_state "TODO" ${_tm_selected[@]}
+  else
+    _tm_change_state "TODO" "$(readlink -f ${_s_inputs[$_s_current_n]})"
   fi
 }
 
