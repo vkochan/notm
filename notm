@@ -109,6 +109,7 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local show=${entry}
   local path
   local link
+  local state
   local rel
 
   tput cup $2 0 >/dev/tty
@@ -152,7 +153,8 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
       link="${link#${TM_ROOT}}"
       rel=$(relpath "$TM_ROOT/TASKS" "$(dirname ${PWD}/${entry})")
       link="${link%${rel}/${entry}}"
-      show="${show} -> $(basename ${link})"
+      state="$(basename ${link})"
+      show=$(printf "%-11s| %s" ${state} ${show})
     fi
   fi
 
