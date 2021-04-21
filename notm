@@ -112,7 +112,7 @@ _tm_echo_off() {
 }
 
 _tm_ls() {
-  ls -l $* | sort | awk 'NF>=9 { if ($1~/^d/) { print $9 } else { print $9 } }'
+  ls -l $* | sort | awk 'NF>=9 { print $9 }'
 }
 
 _sf_get_values() { # {{{
