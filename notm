@@ -18,7 +18,7 @@ TM_WHITE=97
 TM_ROOT="$(readlink -f ${PWD})"
 TM_BASENAME="$(basename $TM_ROOT)"
 
-TM_OPENER=${TM_OPENER:-vim}
+TM_OPENER=${EDITOR:-vim}
 
 _tm_selected=()
 
