@@ -165,7 +165,7 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   if ((_s_v_selected[$3] == 1)); then
     if [ "$entry" != ".." ]; then
       if ! array_contains "${path}" "${_tm_selected[@]}"; then
-        _tm_selected+=($(readlink -f $entry))
+        _tm_selected+=(${path})
       fi 
       prefix=" +"
     fi
