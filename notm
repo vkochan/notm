@@ -317,14 +317,52 @@ _sf_g() {
 }
 
 _sf_r() {
-   local oldname=${_s_inputs[$_s_current_n]}
+   local oldfiles
+   local newfiles
+   local oldname
+   local oldpath
+   local rel_path
+   local newpath
+
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
+   oldname=${_s_inputs[$_s_current_n]}
+   oldpath="$(readlink -f $oldname)"
+   oldfiles=( $(find "${oldpath}" -type f) )
 
    _tm_echo_on
 
    read -e -i $oldname -p "new name: " newname
-   mv $oldname $newname
+
+   newpath="$(readlink -f ${newname})"
 
    _tm_echo_off
+
+   if ! mv $oldname $newname; then
+       return
+   fi
+
+   newfiles=( $(find "${newpath}" -type f) )
+
+   for path in "${oldfiles[@]}"; do
+      for state in $(find $TM_ROOT -maxdepth 1 -type d -printf '%P\n'); do
+          if [ "${state}" == "TASKS" ]; then
+            continue
+          fi
+          if [ -z "${state}" ]; then
+            continue
+          fi
+
+          if find "${TM_ROOT}/${state}" -type l | xargs readlink -m | grep -n -q -F "${path}"; then
+            _tm_change_state "${state}" ${newfiles[@]}
+          fi
+      done
+   done
+
+  _tm_cleanup_links
+  _tm_refresh
 }
 
 _sf_h() { # {{{
