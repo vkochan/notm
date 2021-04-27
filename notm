@@ -48,6 +48,24 @@ _tm_unlink_state() {
   done
 }
 
+_tm_state_color() {
+  local color=$TM_WHITE
+
+  case "$1" in
+    "DONE")
+           color=$TM_BLUE
+           ;;
+    "TODO")
+           color=$TM_GREEN
+           ;;
+    "IN-PROGRESS")
+           color=$TM_YELLOW
+           ;;
+  esac
+
+  echo $color
+}
+
 _tm_change_state() {
   local new_state="$1"
   local rel_dir=""
@@ -140,27 +158,16 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local show=${entry}
   local prefix=""
   local state
+  local color
 
   tput cup $2 0 >/dev/tty
   if [ $1 -eq 1 ];then
     printf "\e[7m" >/dev/tty
   fi
-  local color=$TM_WHITE
 
-  if [ -d "$entry" -a "$entry" != ".." ];then
-    case "$show" in
-      "DONE")
-             color=$TM_BLUE
-             ;;
-      "TODO")
-             color=$TM_GREEN
-             ;;
-      "IN-PROGRESS")
-             color=$TM_YELLOW
-             ;;
-    esac
-    printf "\e[$color;1m" >/dev/tty
-    show="$show [$(find $entry -type f -or -type l | wc -l)]"
+  if [ -d "${entry}" -a "${entry}" != ".." ]; then
+    color=$(_tm_state_color "$entry")
+    show="\e[$color;1m$show\e[0m [$(find $entry -type f -or -type l | wc -l)]"
   fi
 
   if ((_s_v_selected[$3] == 1)); then
@@ -174,21 +181,20 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
     prefix="  "
   fi
 
-
   if [[ "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
     if [ -f "${entry}" ]; then
       for state in "${_tm_states[@]}"; do
           [ ! -d "${TM_ROOT}/${state}" ] && continue
 
           if find "${TM_ROOT}/${state}" -type l | xargs readlink -f | grep -n -q -F "${path}"; then
-            show="$(printf "%-11s| %s" ${state} ${show})"
+            color=$(_tm_state_color "$state")
+            show="$(printf "\e[$color;1m%-11s\e[0m | %s" ${state} ${show})"
           fi
       done
     fi
   fi
 
   printf "${prefix}${show}" > /dev/tty
-
   printf "\e[m" >/dev/tty
   tput cup $2 0 >/dev/tty
 } # }}}
