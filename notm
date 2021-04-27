@@ -20,6 +20,7 @@ TM_BASENAME="$(basename $TM_ROOT)"
 
 TM_OPENER=${EDITOR:-vim}
 
+_tm_states=("TODO" "IN-PROGRESS" "DONE")
 _tm_selected=()
 
 relpath() {
@@ -176,13 +177,8 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
 
   if [[ "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
     if [ -f "${entry}" ]; then
-      for state in $(find $TM_ROOT -maxdepth 1 -type d -printf '%P\n'); do
-          if [ "${state}" == "TASKS" ]; then
-            continue
-          fi
-          if [ -z "${state}" ]; then
-            continue
-          fi
+      for state in "${_tm_states[@]}"; do
+          [ ! -d "${TM_ROOT}/${state}" ] && continue
 
           if find "${TM_ROOT}/${state}" -type l | xargs readlink -f | grep -n -q -F "${path}"; then
             show="$(printf "%-11s| %s" ${state} ${show})"
@@ -347,13 +343,8 @@ _sf_r() {
    newfiles=( $(find "${newpath}" -type f) )
 
    for path in "${oldfiles[@]}"; do
-      for state in $(find $TM_ROOT -maxdepth 1 -type d -printf '%P\n'); do
-          if [ "${state}" == "TASKS" ]; then
-            continue
-          fi
-          if [ -z "${state}" ]; then
-            continue
-          fi
+      for state in "${_tm_states[@]}"; do
+          [ ! -d "${TM_ROOT}/${state}" ] && continue
 
           if find "${TM_ROOT}/${state}" -type l | xargs readlink -m | grep -n -q -F "${path}"; then
             _tm_change_state "${state}" ${newfiles[@]}
