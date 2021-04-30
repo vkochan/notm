@@ -225,6 +225,10 @@ _sf_set_header() { # {{{
 } # }}}
 
 _sf_p() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   for e in "${_tm_selected[@]}"; do 
     cp -r "$e" $PWD
   done
@@ -236,6 +240,10 @@ _sf_p() {
 }
 
 _sf_v() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   for e in "${_tm_selected[@]}"; do 
     mv "$e" $PWD
   done
@@ -271,6 +279,10 @@ _sf_x() {
 }
 
 _sf_c_d() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "DONE" ${_tm_selected[@]}
   else
@@ -279,6 +291,10 @@ _sf_c_d() {
 }
 
 _sf_c_p() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "IN-PROGRESS" ${_tm_selected[@]}
   else
@@ -287,6 +303,10 @@ _sf_c_p() {
 }
 
 _sf_c_t() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "TODO" ${_tm_selected[@]}
   else
@@ -295,7 +315,14 @@ _sf_c_t() {
 }
 
 _sf_t() {
-  local rel_dir=$(relpath "$TM_ROOT/TASKS" "$PWD")
+  local rel_dir
+
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
+  rel_dir=$(relpath "$TM_ROOT/TASKS" "$PWD")
+
    _tm_echo_on
 
    read -p "task name: " task
@@ -308,6 +335,10 @@ _sf_t() {
 }
 
 _sf_g() {
+  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
+      return
+  fi
+
   if [ "$(relpath $TM_ROOT $PWD)" != "." ]; then
     _tm_echo_on
 
