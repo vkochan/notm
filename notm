@@ -131,7 +131,14 @@ _tm_echo_off() {
 }
 
 _tm_ls() {
-  ls -l $* | sort | awk 'NF>=9 { print $9 }'
+  if [ "${PWD}" == "${TM_ROOT}" ]; then
+    echo "TASKS"
+    echo "IN-PROGRESS"
+    echo "TODO"
+    echo "DONE"
+  else
+    ls -l $* | sort | awk 'NF>=9 { print $9 }'
+  fi
 }
 
 _sf_get_values() { # {{{
@@ -159,6 +166,10 @@ _sf_printline() { # useage: _sf_printline is_selected n_line n_input {{{
   local prefix=""
   local state
   local color
+
+  if [ "${PWD}" == "${TM_ROOT}" -a "${entry}" != "TASKS" -a "${entry}" != ".." ]; then
+    show="#${show}"
+  fi
 
   tput cup $2 0 >/dev/tty
   if [ $1 -eq 1 ];then
