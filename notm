@@ -27,6 +27,13 @@ relpath() {
   realpath --relative-to=$1 $2
 }
 
+locpath() {
+  local rel_root="$(realpath --relative-to=$(dirname ${1}) ${TM_ROOT})"
+  local rel_path="$(realpath --relative-to=${TM_ROOT} ${1})"
+
+  echo "${rel_root}/${rel_path}"
+}
+
 _tm_cleanup_links() {
   find -L ${TM_ROOT} -type l -delete
   find ${TM_ROOT}/TODO -empty -type d -delete 2> /dev/null
@@ -95,7 +102,7 @@ _tm_change_state() {
 
       mkdir -p ${new_dir}
 
-      ln -sf ${TM_ROOT}/TASKS/${rel_dir}/${task} ${new_dir}/${task}
+      ln -sf $(locpath ${TM_ROOT}/TASKS/${rel_dir}/${task}) ${new_dir}/${task}
 
       _tm_cleanup_links
     fi
@@ -340,7 +347,7 @@ _sf_t() {
    touch "$task"
 
    mkdir -p ${TM_ROOT}/TODO/${rel_dir}
-   ln -sf $(readlink -f ${task}) ${TM_ROOT}/TODO/${rel_dir}/${task}
+   ln -sf $(locpath $(readlink -f ${task})) ${TM_ROOT}/TODO/${rel_dir}/${task}
 
    _tm_echo_off
 }
