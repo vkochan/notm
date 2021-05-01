@@ -20,7 +20,7 @@ TM_BASENAME="$(basename $TM_ROOT)"
 
 TM_OPENER=${EDITOR:-vim}
 
-_tm_states=("TODO" "IN-PROGRESS" "DONE")
+_tm_states=("IN-PROGRESS" "TODO" "DONE")
 _tm_selected=()
 
 relpath() {
@@ -140,9 +140,9 @@ _tm_echo_off() {
 _tm_ls() {
   if [ "${PWD}" == "${TM_ROOT}" ]; then
     echo "TASKS"
-    echo "IN-PROGRESS"
-    echo "TODO"
-    echo "DONE"
+    for state in "${_tm_states[@]}"; do
+        [ -d "${PWD}/${state}" ] && echo "${state}"
+    done
   else
     ls -l $* | sort | awk 'NF>=9 { print $9 }'
   fi
