@@ -9,6 +9,8 @@ PREFIX=$(dirname $(dirname "$0"))
 _SENTAKU_SEPARATOR=$'\n'
 _SENTAKU_EDITOR=""
 
+TM_DT_FMT="%Y-%b-%d  %H:%M"
+
 TM_RED=31
 TM_GREEN=32
 TM_YELLOW=33
@@ -73,6 +75,20 @@ _tm_state_color() {
   echo $color
 }
 
+_tm_log_state() {
+  local task=$1
+  local state=$2
+  local dt
+
+  dt=$(date +"${TM_DT_FMT}")
+  mkdir -p ${TM_ROOT}/LOG
+  touch ${TM_ROOT}/LOG/all
+  cp ${TM_ROOT}/LOG/all /tmp/notm-log.$$
+  printf "%s  %-11s  %s\n" "${dt}" "${state}" "${task}" > ${TM_ROOT}/LOG/all
+  cat /tmp/notm-log.$$ >> ${TM_ROOT}/LOG/all
+  rm -f /tmp/notm-log.$$
+}
+
 _tm_change_state() {
   local new_state="$1"
   local rel_dir=""
@@ -103,6 +119,8 @@ _tm_change_state() {
       mkdir -p ${new_dir}
 
       ln -sf $(locpath ${TM_ROOT}/TASKS/${rel_dir}/${task}) ${new_dir}/${task}
+
+      _tm_log_state "$(locpath ${TM_ROOT}/TASKS/${rel_dir}/${task})" "${new_state}"
 
       _tm_cleanup_links
     fi
@@ -140,6 +158,8 @@ _tm_echo_off() {
 _tm_ls() {
   if [ "${PWD}" == "${TM_ROOT}" ]; then
     echo "TASKS"
+    [ -d "LOG" ] && echo "LOG"
+
     for state in "${_tm_states[@]}"; do
         [ -d "${PWD}/${state}" ] && echo "${state}"
     done
