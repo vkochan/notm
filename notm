@@ -133,7 +133,7 @@ _tm_change_state() {
 }
 
 _tm_init() {
-    mkdir $PWD/TASKS
+    mkdir -p ${PWD}/TASKS
 
     _tm_cleanup_links
 }
