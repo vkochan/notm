@@ -448,7 +448,8 @@ while [[ $# -gt 0 ]]
 do
   case $1 in
     "-d")
-        cd $2
+        mkdir -p ${2}
+        cd ${2}
         TM_ROOT="$(readlink -f ${PWD})"
         TM_BASENAME="$(basename $TM_ROOT)"
         shift 1
