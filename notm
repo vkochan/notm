@@ -317,10 +317,6 @@ _sf_x() {
 }
 
 _sf_c_d() {
-  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
-      return
-  fi
-
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "DONE" ${_tm_selected[@]}
   else
@@ -329,10 +325,6 @@ _sf_c_d() {
 }
 
 _sf_c_p() {
-  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
-      return
-  fi
-
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "IN-PROGRESS" ${_tm_selected[@]}
   else
@@ -341,10 +333,6 @@ _sf_c_p() {
 }
 
 _sf_c_t() {
-  if [[ ! "$PWD" =~ "$TM_ROOT/TASKS" ]]; then
-      return
-  fi
-
   if (( ${#_tm_selected[@]} > 0 )); then
     _tm_change_state "TODO" ${_tm_selected[@]}
   else
